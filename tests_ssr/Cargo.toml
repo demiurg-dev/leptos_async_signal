@@ -11,4 +11,5 @@ expect-test = "1.5"
 futures = "0.3"
 leptos = { workspace = true, features = ["ssr"] }
 leptos_async_signal = { path = "../leptos_async_signal", features = ["ssr"] }
+reactive_graph = { version = "0.1" }
 tokio.workspace = true
