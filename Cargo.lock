@@ -1583,9 +1583,9 @@ dependencies = [
 
 [[package]]
 name = "reactive_graph"
-version = "0.1.0"
+version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c27f54685c1416af1f323a0c40e71cbdae281a1ebc623591790d367222d0ac65"
+checksum = "04db00da5327bfd67a75b8d39dd1e8dff14509f375f0618110e30d28d4fbea0d"
 dependencies = [
  "any_spawner",
  "async-lock",
@@ -2029,6 +2029,7 @@ dependencies = [
  "futures",
  "leptos",
  "leptos_async_signal",
+ "reactive_graph",
  "tokio",
 ]
 
