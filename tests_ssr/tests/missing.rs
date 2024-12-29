@@ -1,6 +1,7 @@
 use futures::StreamExt;
 use leptos::prelude::*;
 use leptos_async_signal::*;
+use tests_ssr::init_test;
 
 #[component]
 fn App() -> impl IntoView {
@@ -53,7 +54,8 @@ fn Component(msg_tx: AsyncWriteSignal<String>) -> impl IntoView {
 
 #[tokio::test]
 async fn render_async() {
-    any_spawner::Executor::init_tokio().unwrap();
+    init_test();
+    
     let app = view! { <App /> };
     let html = app.to_html_stream_in_order().collect::<String>().await;
     println!("{html}");
