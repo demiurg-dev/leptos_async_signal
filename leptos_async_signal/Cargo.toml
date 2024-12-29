@@ -7,7 +7,7 @@ description = "Async signal for leptos Rust web framework."
 categories = ["web-programming", "asynchronous"]
 keywords = ["web", "reactive", "ssr", "async", "leptos"]
 readme = "../README.md"
-version = "0.1.0"
+version = "0.2.0"
 rust-version = "1.76"
 edition = "2021"
 
@@ -17,6 +17,6 @@ tokio = { workspace = true, optional = true }
 serde.workspace = true
 
 [features]
-default = []
+default = ["ssr"]
 hydrate = ["leptos/hydrate"]
 ssr = ["leptos/ssr", "dep:tokio"]
