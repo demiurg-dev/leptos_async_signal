@@ -158,7 +158,7 @@ fn PostPage() -> impl IntoView {
 
                 post_res.map_err(|err| err.to_string())
             }
-            None => Err(format!("Invalid URL"))
+            None => Err("Invalid URL".to_string())
         }
     });
 
