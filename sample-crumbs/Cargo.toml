@@ -7,7 +7,7 @@ edition = "2021"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-leptos = { version = "0.7.0" }
+leptos.workspace = true
 leptos_async_signal = { path = "../leptos_async_signal" }
 leptos_router = { version = "0.7.0" }
 axum = { version = "0.7", optional = true }
