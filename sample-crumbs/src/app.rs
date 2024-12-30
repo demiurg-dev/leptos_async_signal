@@ -15,14 +15,14 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
         <!DOCTYPE html>
         <html lang="en">
             <head>
-                <meta charset="utf-8"/>
-                <meta name="viewport" content="width=device-width, initial-scale=1"/>
+                <meta charset="utf-8" />
+                <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <AutoReload options=options.clone() />
-                <HydrationScripts options/>
-                <MetaTags/>
+                <HydrationScripts options />
+                <MetaTags />
             </head>
             <body>
-                <App/>
+                <App />
             </body>
         </html>
     }
@@ -72,9 +72,12 @@ impl Crumbs {
             // Show on home page.
             Crumbs::Home => view! { <span>Home</span> }.into_any(),
             // Show on post page.
-            Crumbs::Post { title } => {
-                view! { <a href="/">Home</a> | <span>{title}</span> }.into_any()
+            Crumbs::Post { title } => view! {
+                <a href="/">Home</a>
+                |
+                <span>{title}</span>
             }
+            .into_any(),
         }
     }
 }
@@ -84,9 +87,7 @@ impl Crumbs {
 fn Crumbs(crumbs: Resource<Crumbs>) -> impl IntoView {
     view! {
         <p>
-            <Suspense>
-                {move || crumbs.get().unwrap_or_default().into_view() }
-            </Suspense>
+            <Suspense>{move || crumbs.get().unwrap_or_default().into_view()}</Suspense>
         </p>
     }
 }
@@ -118,23 +119,27 @@ fn HomePage() -> impl IntoView {
         <Title text="Welcome to my blog!" />
         <Suspense>
             <ul>
-            {move || Suspend::new(async move {
-                posts
-                    .await
-                    .into_iter()
-                    .map(|src| {
-                        view! {
-                            <For
-                                each=move || src.clone()
-                                key=|(id, _)| *id
-                                children=|(id, post)| view!{
-                                    <li><a href=format!("/post/{id}")>{post.title}</a></li>
-                                }
-                            />
-                        }
-                    })
-                    .collect_view()
-            })}
+                {move || Suspend::new(async move {
+                    posts
+                        .await
+                        .into_iter()
+                        .map(|src| {
+                            view! {
+                                <For
+                                    each=move || src.clone()
+                                    key=|(id, _)| *id
+                                    children=|(id, post)| {
+                                        view! {
+                                            <li>
+                                                <a href=format!("/post/{id}")>{post.title}</a>
+                                            </li>
+                                        }
+                                    }
+                                />
+                            }
+                        })
+                        .collect_view()
+                })}
             </ul>
         </Suspense>
     }
@@ -176,21 +181,19 @@ fn PostPage() -> impl IntoView {
             {move || Suspend::new(async move {
                 match post.await {
                     Ok(post) => {
-                        let body =
-                            post
-                                .body
-                                .lines()
-                                .map(|line| view! { <p>{ line.to_string() }</p> })
-                                .collect_view();
+                        let body = post
+                            .body
+                            .lines()
+                            .map(|line| view! { <p>{line.to_string()}</p> })
+                            .collect_view();
                         view! {
                             <Title text=post.title.clone() />
                             <h1>{post.title}</h1>
                             {body}
-                        }.into_any()
+                        }
+                            .into_any()
                     }
-                    Err(err) => view! {
-                        <h1>Error: {err}</h1>
-                    }.into_any()
+                    Err(err) => view! { <h1>Error: {err}</h1> }.into_any(),
                 }
             })}
         </Suspense>

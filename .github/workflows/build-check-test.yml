@@ -18,7 +18,17 @@ jobs:
     - uses: actions/checkout@v4
     - name: Clean
       run: cargo clean
-    - name: Build
+    - name: Install cargo-leptos
+      run: cargo install --locked cargo-leptos
+    - name: Install leptosfmt
+      run: cargo install --locked leptosfmt
+    - name: Build default
       run: cargo build --verbose
+    - name: Build ssr feature
+      run: cargo build -p leptos_async_signal -F ssr --verbose
+    - name: Build sample app
+      run: cargo leptos build -p sample-crumbs
+    - name: Checks
+      run: make check-all
     - name: Run tests
       run: cargo test --verbose
