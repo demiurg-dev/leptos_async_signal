@@ -55,7 +55,7 @@ fn Component(msg_tx: AsyncWriteSignal<String>) -> impl IntoView {
 #[tokio::test]
 async fn render_async() {
     init_test();
-    
+
     let app = view! { <App /> };
     let html = app.to_html_stream_in_order().collect::<String>().await;
     println!("{html}");

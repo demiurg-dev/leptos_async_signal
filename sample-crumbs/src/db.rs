@@ -3,7 +3,8 @@
 use std::time::Duration;
 
 use itertools::Itertools;
-use phf::{Map, phf_map};
+use phf::{phf_map, Map};
+
 use crate::model::Post;
 
 /// Latency of DB operation.
@@ -17,10 +18,7 @@ struct DbPost {
 
 impl From<&DbPost> for Post {
     fn from(value: &DbPost) -> Self {
-        Self {
-            title: value.title.to_string(),
-            body: value.body.to_string(),
-        }
+        Self { title: value.title.to_string(), body: value.body.to_string() }
     }
 }
 
@@ -32,10 +30,12 @@ static ENTRIES: Map<u64, DbPost> = phf_map! {
 };
 
 /// Fetch all posts from the database.
-#[must_use]
 pub async fn all_posts() -> impl Iterator<Item = (u64, Post)> {
     tokio::time::sleep(DB_LATENCY).await;
-    ENTRIES.into_iter().sorted_by_key(|(id, _post)| **id).map(|(id, post)| (*id, Post::from(post)))
+    ENTRIES
+        .into_iter()
+        .sorted_by_key(|(id, _post)| **id)
+        .map(|(id, post)| (*id, Post::from(post)))
 }
 
 /// Fetch a post by ID from the database.

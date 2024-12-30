@@ -1,0 +1,38 @@
+name: BuildCheckTest
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Clean
+      run: cargo clean
+    - name: Install wasm target
+      run: rustup target add wasm32-unknown-unknown
+    - name: Install nightly rustfmt
+      run: rustup toolchain install nightly --allow-downgrade -c rustfmt
+    - name: Install cargo-leptos
+      run: cargo install --locked cargo-leptos
+    - name: Install leptosfmt
+      run: cargo install --locked leptosfmt
+    - name: Build default
+      run: cargo build --verbose
+    - name: Build ssr feature
+      run: cargo build -p leptos_async_signal -F ssr --verbose
+    - name: Build sample app
+      run: cargo leptos build -p sample-crumbs
+    - name: Checks
+      run: make check-all
+    - name: Run tests
+      run: cargo test --verbose
