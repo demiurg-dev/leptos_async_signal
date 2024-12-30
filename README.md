@@ -10,7 +10,8 @@ certain application elements need to be generated asynchronously before the asso
 
 ## Features
 
-The core feature of `leptos_async_signal` is the **asynchronous signal**. An async signal is a combination of:
+The core feature of `leptos_async_signal` is the **asynchronous signal**. An async signal is a 
+combination of:
 
 1. **A writable signal**: A Leptos-signal-like object that allows updates of its value.
 2. **A resource**: A Leptos resource that produces a value asynchronously whenever the signal is 
@@ -36,12 +37,15 @@ Please take a look at the [sample-crumbs](sample-crumbs/) example for detailed u
 The main idea is as follows:
 - At the top of the application, create a write signal and a resource that hold the breadcrumbs state.
 - (Optional) Store the writable signal in context so that it does not need to be passed down.
-- Pass the resource to a top-level component that generates the breadcrumbs using something like `Suspend`.
-- On a particular page, write to the write signal (obtained from parameters or global context) when the required data for the breadcrumbs is obtained (this can include data from a server function).
+- Pass the resource to a top-level component that generates the breadcrumbs using something like 
+    `Suspend`.
+- On a particular page, write to the write signal (obtained from parameters or global context) when 
+    the required data for the breadcrumbs is obtained (this can include data from a server function).
 
 ## Usage
 
-To use `leptos_async_signal`, add it to your `Cargo.toml`, gated on `ssr` and `hydration` features similar to the `leptos` crate itself:
+To use `leptos_async_signal`, add it to your `Cargo.toml`, gated on `ssr` and `hydration` features 
+similar to the `leptos` crate itself:
 
 ```toml
 [dependencies]
@@ -56,20 +60,19 @@ ssr = ["leptos/ssr", "leptos_async_signal/ssr"]
 
 See an example in `sample-crumbs` [Cargo.toml](sample-crumbs/Cargo.toml)
 
-## API
+## Leptos versions
 
-The main API entry is:
-
- ```rust
- leptos_async_signal::async_signal<T>(value: T) -> (AsyncWriteSygnal<T>, Resource<T>)
- ```
+The currently supported Leptos version is `0.7.x`.
 
 ## Notes
 
-- In SSR mode, `leptos_async_signal` ensures that resources are fully resolved before rendering, providing a smooth and efficient server-side rendering experience.
-- In other modes (e.g., client-side rendering), resources behave like regular Leptos resources, updating reactively when their associated signal changes.
+- In SSR mode, `leptos_async_signal` ensures that resources are fully resolved before rendering, 
+    providing a smooth and efficient server-side rendering experience.
+- In other modes (e.g., client-side rendering), resources behave like regular Leptos resources, 
+    updating reactively when their associated signal changes.
 
 ## Contributions
 
-Contributions to `leptos_async_signal` are welcome! If you encounter bugs, have feature requests, or want to contribute improvements, please open an issue or a pull request on the [GitHub repository](https://github.com/demiurg-dev/leptos_async_signal).
-
+Contributions to `leptos_async_signal` are welcome! If you encounter bugs, have feature requests, or 
+want to contribute improvements, please open an issue or a pull request on the [GitHub repository]
+(https://github.com/demiurg-dev/leptos_async_signal).

@@ -21,6 +21,10 @@
 //! Check the
 //! [breadcrumbs example](https://github.com/demiurg-dev/leptos_async_signal/tree/main/sample-crumbs)
 //! in the repository.
+//! 
+//! //! # Leptos versions
+//! 
+//! The currently supported Leptos version is `0.7.x`.
 
 use leptos::prelude::*;
 use serde::de::DeserializeOwned;
