@@ -8,7 +8,7 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 leptos = { version = "0.7.0" }
-leptos_async_signal = { path = "../leptos_async_signal", default-features = false }
+leptos_async_signal = { path = "../leptos_async_signal" }
 leptos_router = { version = "0.7.0" }
 axum = { version = "0.7", optional = true }
 console_error_panic_hook = "0.1"
@@ -26,7 +26,7 @@ itertools = "0.13"
 
 [features]
 default = ["ssr"]
-hydrate = ["leptos/hydrate", "leptos_async_signal/hydrate"]
+hydrate = ["leptos/hydrate"]
 ssr = [
     "dep:axum",
     "dep:tokio",

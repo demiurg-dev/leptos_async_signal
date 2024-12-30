@@ -17,6 +17,5 @@ tokio = { workspace = true, optional = true }
 serde.workspace = true
 
 [features]
-default = ["ssr"]
-hydrate = ["leptos/hydrate"]
+default = []
 ssr = ["leptos/ssr", "dep:tokio"]
