@@ -1,4 +1,4 @@
-//! # About async signal.
+//! # About async signal
 //! 
 //! `leptos_async_signal` is a library built on top of
 //! [Leptos](https://github.com/leptos-rs/leptos) that extends the functionality of Leptos signals
@@ -16,7 +16,7 @@
 //! This pattern mimics the behavior of `leptos_meta` for managing HTML meta elements but extends
 //! the functionality to any application element.
 //! 
-//! # Example:
+//! # Example
 //! 
 //! Check the
 //! [breadcrumbs example](https://github.com/demiurg-dev/leptos_async_signal/tree/main/sample-crumbs)
