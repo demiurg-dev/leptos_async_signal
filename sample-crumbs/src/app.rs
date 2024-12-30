@@ -1,15 +1,16 @@
 use leptos::prelude::*;
 use leptos_async_signal::{async_signal, AsyncWriteSignal};
 use leptos_meta::{provide_meta_context, MetaTags, Title};
-use leptos_router::{
-    components::{Route, Router, Routes}, hooks::use_params, params::Params, path, SsrMode
-};
+use leptos_router::components::{Route, Router, Routes};
+use leptos_router::hooks::use_params;
+use leptos_router::params::Params;
+use leptos_router::{path, SsrMode};
 use serde::{Deserialize, Serialize};
 
 use crate::model::Post;
 
 /// The top-level application HTML shell.
-pub fn shell(options: LeptosOptions) -> impl IntoView {    
+pub fn shell(options: LeptosOptions) -> impl IntoView {
     view! {
         <!DOCTYPE html>
         <html lang="en">
@@ -35,7 +36,8 @@ pub fn App() -> impl IntoView {
 
     // Create async resource and signal.
     let (crumbs_res, crumbs_tx) = async_signal(Crumbs::default());
-    // Provide the write side of the signal as context, so we don't have to pass it to each component.
+    // Provide the write side of the signal as context, so we don't have to pass it
+    // to each component.
     provide_context(crumbs_tx);
 
     view! {
@@ -58,7 +60,9 @@ pub fn App() -> impl IntoView {
 enum Crumbs {
     #[default]
     Home,
-    Post { title: String },
+    Post {
+        title: String,
+    },
 }
 
 impl Crumbs {
@@ -70,7 +74,7 @@ impl Crumbs {
             // Show on post page.
             Crumbs::Post { title } => {
                 view! { <a href="/">Home</a> | <span>{title}</span> }.into_any()
-            },
+            }
         }
     }
 }
@@ -96,7 +100,9 @@ async fn list_posts() -> Result<Vec<(u64, Post)>, ServerFnError> {
 /// An  API to fetch a post by ID.
 #[server]
 async fn post_by_id(id: u64) -> Result<Post, ServerFnError<String>> {
-    crate::db::post_by_id(id).await.ok_or(ServerFnError::WrappedServerError(format!("Post not found: {id}")))
+    crate::db::post_by_id(id)
+        .await
+        .ok_or(ServerFnError::WrappedServerError(format!("Post not found: {id}")))
 }
 
 /// Renders the home page with list of posts.
@@ -144,30 +150,38 @@ struct PostRequest {
 #[component]
 fn PostPage() -> impl IntoView {
     let params = use_params::<PostRequest>();
-    let post = Resource::new(move || params.read().as_ref().ok().and_then(|pid| pid.id), |post_id| async move {
-        match post_id {
-            Some(id) => {
-                let post_res = post_by_id(id).await;
+    let post = Resource::new(
+        move || params.read().as_ref().ok().and_then(|pid| pid.id),
+        |post_id| async move {
+            match post_id {
+                Some(id) => {
+                    let post_res = post_by_id(id).await;
 
-                // Set crumbs to the post, once fetched.
-                let crumbs = use_context::<AsyncWriteSignal<Crumbs>>().unwrap();
-                match &post_res {
-                    Ok(post) => crumbs.set(Crumbs::Post { title: post.title.clone() }),
-                    Err(_) => crumbs.set(Crumbs::Home),
+                    // Set crumbs to the post, once fetched.
+                    let crumbs = use_context::<AsyncWriteSignal<Crumbs>>().unwrap();
+                    match &post_res {
+                        Ok(post) => crumbs.set(Crumbs::Post { title: post.title.clone() }),
+                        Err(_) => crumbs.set(Crumbs::Home),
+                    }
+
+                    post_res.map_err(|err| err.to_string())
                 }
-
-                post_res.map_err(|err| err.to_string())
+                None => Err("Invalid URL".to_string()),
             }
-            None => Err("Invalid URL".to_string())
-        }
-    });
+        },
+    );
 
     view! {
         <Suspense>
             {move || Suspend::new(async move {
                 match post.await {
                     Ok(post) => {
-                        let body = post.body.lines().map(|line| view! { <p>{ line.to_string() }</p> }).collect_view();
+                        let body =
+                            post
+                                .body
+                                .lines()
+                                .map(|line| view! { <p>{ line.to_string() }</p> })
+                                .collect_view();
                         view! {
                             <Title text=post.title.clone() />
                             <h1>{post.title}</h1>

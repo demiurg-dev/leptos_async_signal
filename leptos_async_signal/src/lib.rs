@@ -1,29 +1,31 @@
 //! # About async signal
-//! 
+//!
 //! `leptos_async_signal` is a library built on top of
 //! [Leptos](https://github.com/leptos-rs/leptos) that extends the functionality of Leptos signals
-//!  to provide a mechanism for generating values  asynchronously. This library is particularly
-//! useful in server-side rendering (SSR) contexts where  certain application elements need to be
-//! generated asynchronously before the associated signal is set.
-//! 
+//!  to provide a mechanism for generating values  asynchronously. This library
+//! is particularly useful in server-side rendering (SSR) contexts where
+//! certain application elements need to be generated asynchronously before the
+//! associated signal is set.
+//!
 //! # Use case
-//! 
-//! A typical example is generating breadcrumbs for a page. Breadcrumbs, which appear at the top
-//! of the page, often depend on deeper page elements or server-side data. With
-//! `leptos_async_signal`, you can generate these breadcrumbs asynchronously in SSR mode and still
-//! allow them to react to changes dynamically in other modes.
-//! 
-//! This pattern mimics the behavior of `leptos_meta` for managing HTML meta elements but extends
-//! the functionality to any application element.
-//! 
+//!
+//! A typical example is generating breadcrumbs for a page. Breadcrumbs, which
+//! appear at the top of the page, often depend on deeper page elements or
+//! server-side data. With `leptos_async_signal`, you can generate these
+//! breadcrumbs asynchronously in SSR mode and still allow them to react to
+//! changes dynamically in other modes.
+//!
+//! This pattern mimics the behavior of `leptos_meta` for managing HTML meta
+//! elements but extends the functionality to any application element.
+//!
 //! # Example
-//! 
+//!
 //! Check the
 //! [breadcrumbs example](https://github.com/demiurg-dev/leptos_async_signal/tree/main/sample-crumbs)
 //! in the repository.
-//! 
+//!
 //! //! # Leptos versions
-//! 
+//!
 //! The currently supported Leptos version is `0.7.x`.
 
 use leptos::prelude::*;
@@ -35,8 +37,9 @@ mod async_state;
 #[cfg(feature = "ssr")]
 use async_state::AsyncState;
 
-/// An async write signal. This is almost the same as the regular Leptos write signal, but under
-///  the hood also takes care of notifying the resource about the new value (in SSR mode).
+/// An async write signal. This is almost the same as the regular Leptos write
+/// signal, but under  the hood also takes care of notifying the resource about
+/// the new value (in SSR mode).
 #[derive(Clone)]
 pub struct AsyncWriteSignal<T>
 where
@@ -47,9 +50,10 @@ where
     state: AsyncState,
 }
 
-/// Creates a new async signal, that is, a pair of a resource and an async write signal. The
-/// default provided value is used only as a placeholder value in the case that write signal
-/// is never written to (detected by the dropped value before write/set).
+/// Creates a new async signal, that is, a pair of a resource and an async write
+/// signal. The default provided value is used only as a placeholder value in
+/// the case that write signal is never written to (detected by the dropped
+/// value before write/set).
 pub fn async_signal<T>(default: T) -> (Resource<T>, AsyncWriteSignal<T>)
 where
     T: Clone + Send + Sync + PartialEq + Serialize + DeserializeOwned,
