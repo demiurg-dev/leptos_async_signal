@@ -930,7 +930,7 @@ dependencies = [
 
 [[package]]
 name = "leptos_async_signal"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "leptos",
  "serde",

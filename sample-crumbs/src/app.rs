@@ -8,6 +8,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::model::Post;
 
+/// The top-level application HTML shell.
 pub fn shell(options: LeptosOptions) -> impl IntoView {    
     view! {
         <!DOCTYPE html>
@@ -26,19 +27,24 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
     }
 }
 
+/// The application top-level component.
 #[component]
 pub fn App() -> impl IntoView {
     // Provides context that manages stylesheets, titles, meta tags, etc.
     provide_meta_context();
 
+    // Create async resource and signal.
     let (crumbs_res, crumbs_tx) = async_signal(Crumbs::default());
+    // Provide the write side of the signal as context, so we don't have to pass it to each component.
     provide_context(crumbs_tx);
 
     view! {
         <Router>
             <main>
+                // Create crumbs from the async signal's resource.
                 <Crumbs crumbs=crumbs_res />
                 <Routes fallback=|| "Page not found.".into_view()>
+                    // NOTE: This all makes sense for SsrMode Async.
                     <Route path=path!("") ssr=SsrMode::Async view=HomePage />
                     <Route path=path!("post/:id") ssr=SsrMode::Async view=PostPage />
                 </Routes>
@@ -47,6 +53,7 @@ pub fn App() -> impl IntoView {
     }
 }
 
+/// Crumbs are either for a home page or for a post page.
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
 enum Crumbs {
     #[default]
@@ -55,9 +62,12 @@ enum Crumbs {
 }
 
 impl Crumbs {
+    /// Generates view for crumbs.
     fn into_view(self) -> impl IntoView {
         match self {
+            // Show on home page.
             Crumbs::Home => view! { <span>Home</span> }.into_any(),
+            // Show on post page.
             Crumbs::Post { title } => {
                 view! { <a href="/">Home</a> | <span>{title}</span> }.into_any()
             },
@@ -65,6 +75,7 @@ impl Crumbs {
     }
 }
 
+/// A component to show the crumbs. Use resource provided by async signal.
 #[component]
 fn Crumbs(crumbs: Resource<Crumbs>) -> impl IntoView {
     view! {
@@ -76,11 +87,13 @@ fn Crumbs(crumbs: Resource<Crumbs>) -> impl IntoView {
     }
 }
 
+/// An API to list all posts.
 #[server]
 async fn list_posts() -> Result<Vec<(u64, Post)>, ServerFnError> {
     Ok(crate::db::all_posts().await.collect())
 }
 
+/// An  API to fetch a post by ID.
 #[server]
 async fn post_by_id(id: u64) -> Result<Post, ServerFnError<String>> {
     crate::db::post_by_id(id).await.ok_or(ServerFnError::WrappedServerError(format!("Post not found: {id}")))
@@ -89,6 +102,7 @@ async fn post_by_id(id: u64) -> Result<Post, ServerFnError<String>> {
 /// Renders the home page with list of posts.
 #[component]
 fn HomePage() -> impl IntoView {
+    // Set crumbs to home.
     let crumbs = use_context::<AsyncWriteSignal<Crumbs>>().unwrap();
     crumbs.set(Crumbs::Home);
 
@@ -120,11 +134,13 @@ fn HomePage() -> impl IntoView {
     }
 }
 
+/// A type to hold post page params.
 #[derive(Clone, Copy, Params, PartialEq)]
 struct PostRequest {
     id: Option<u64>,
 }
 
+/// Renders the page to show a single post.
 #[component]
 fn PostPage() -> impl IntoView {
     let params = use_params::<PostRequest>();
@@ -133,7 +149,7 @@ fn PostPage() -> impl IntoView {
             Some(id) => {
                 let post_res = post_by_id(id).await;
 
-                // Set crumbs
+                // Set crumbs to the post, once fetched.
                 let crumbs = use_context::<AsyncWriteSignal<Crumbs>>().unwrap();
                 match &post_res {
                     Ok(post) => crumbs.set(Crumbs::Post { title: post.title.clone() }),

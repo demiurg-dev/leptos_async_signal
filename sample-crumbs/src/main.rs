@@ -1,3 +1,4 @@
+// Note: this is original axum template code. Nothing has changed.
 
 #[cfg(feature = "ssr")]
 #[tokio::main]
