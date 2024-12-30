@@ -1,4 +1,4 @@
-[![CI Status](https://github.com/demiurg-dev/leptos_async_signal/actions/workflows/rust.yml/badge.svg)](https://github.com/demiurg-dev/leptos_async_signal/actions/workflows/rust.yml)
+[![CI Status](https://github.com/demiurg-dev/leptos_async_signal/actions/workflows/build-check-test.yml/badge.svg)](https://github.com/demiurg-dev/leptos_async_signal/actions/workflows/build-check-test.yml)
 [![Crates.io Version](https://img.shields.io/crates/v/leptos_async_signal)](https://crates.io/crates/leptos_async_signal)
 [![docs.rs](https://img.shields.io/docsrs/leptos_async_signal)](https://docs.rs/leptos_async_signal/latest/leptos_async_signal/)
 
