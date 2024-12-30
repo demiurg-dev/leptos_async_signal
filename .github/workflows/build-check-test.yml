@@ -18,6 +18,8 @@ jobs:
     - uses: actions/checkout@v4
     - name: Clean
       run: cargo clean
+    - name: Install wasm target
+      run: rustup target add wasm32-unknown-unknown
     - name: Install cargo-leptos
       run: cargo install --locked cargo-leptos
     - name: Install leptosfmt
