@@ -30,37 +30,24 @@ use leptos::prelude::*;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 
-const _: () = assert!(
-    cfg!(not(all(feature = "hydrate", feature = "ssr"))),
-    "cannot enable hydrate and ssr features at the same time"
-);
-const _: () = assert!(
-    cfg!(any(feature = "hydrate", feature = "ssr")),
-    "need to enable hydrate or ssr feature"
-);
-
 #[cfg(feature = "ssr")]
-mod async_state_ssr;
+mod async_state;
 #[cfg(feature = "ssr")]
-use async_state_ssr::AsyncState;
-
-#[cfg(feature = "hydrate")]
-mod async_state_hydrate;
-#[cfg(feature = "hydrate")]
-use async_state_hydrate::AsyncState;
+use async_state::AsyncState;
 
 /// An async write signal. This is almost the same as the regular Leptos write signal, but under
-///  the hood also takes care of notifying the resource about the new value.
+///  the hood also takes care of notifying the resource about the new value (in SSR mode).
 #[derive(Clone)]
 pub struct AsyncWriteSignal<T>
 where
     T: 'static,
 {
     inner: WriteSignal<T>,
+    #[cfg(feature = "ssr")]
     state: AsyncState,
 }
 
-/// Creates a new async signal, that is a pair of a resource and an async write signal. The
+/// Creates a new async signal, that is, a pair of a resource and an async write signal. The
 /// default provided value is used only as a placeholder value in the case that write signal
 /// is never written to (detected by the dropped value before write/set).
 pub fn async_signal<T>(default: T) -> (Resource<T>, AsyncWriteSignal<T>)
@@ -68,16 +55,20 @@ where
     T: Clone + Send + Sync + PartialEq + Serialize + DeserializeOwned,
 {
     let (signal_read, signal_write) = signal(default);
+    #[cfg(feature = "ssr")]
     let state = AsyncState::default();
     let signal_write = AsyncWriteSignal {
         inner: signal_write,
+        #[cfg(feature = "ssr")]
         state: state.clone(),
     };
     let resource = Resource::new(
         move || signal_read.get(),
         move |_| {
+            #[cfg(feature = "ssr")]
             let state = state.clone();
             async move {
+                #[cfg(feature = "ssr")]
                 state.wait().await;
                 signal_read.get_untracked()
             }
@@ -94,18 +85,19 @@ where
 
     fn set(&self, value: Self::Value) {
         self.inner.set(value);
-        #[cfg(not(feature = "hydrate"))]
+        #[cfg(feature = "ssr")]
         self.state.mark_ready();
     }
 
     fn try_set(&self, value: Self::Value) -> Option<Self::Value> {
         let res = self.inner.try_set(value);
-        #[cfg(not(feature = "hydrate"))]
+        #[cfg(feature = "ssr")]
         self.state.mark_ready();
         res
     }
 }
 
+#[cfg(feature = "ssr")]
 impl<T> Drop for AsyncWriteSignal<T> {
     fn drop(&mut self) {
         self.state.mark_ready();
