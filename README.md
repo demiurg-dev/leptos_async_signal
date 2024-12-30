@@ -44,8 +44,7 @@ The main idea is as follows:
 
 ## Usage
 
-To use `leptos_async_signal`, add it to your `Cargo.toml`, gated on `ssr` and `hydration` features 
-similar to the `leptos` crate itself:
+To use `leptos_async_signal`, add it to your `Cargo.toml`, and use `ssr` feature appropriately:
 
 ```toml
 [dependencies]
@@ -54,7 +53,8 @@ leptos = "0.7"
 
 [features]
 default = []
-hydrate = ["leptos/hydrate", "leptos_async_signal/hydrate"]
+hydrate = ["leptos/hydrate"]
+# In app's ssr feature, alo use leptos_async_signal ssr feature
 ssr = ["leptos/ssr", "leptos_async_signal/ssr"]
 ```
 
