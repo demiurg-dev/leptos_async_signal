@@ -84,7 +84,7 @@ impl Crumbs {
 
 /// A component to show the crumbs. Use resource provided by async signal.
 #[component]
-fn Crumbs(crumbs: Resource<Crumbs>) -> impl IntoView {
+fn Crumbs(crumbs: ArcResource<Crumbs>) -> impl IntoView {
     view! {
         <p>
             <Suspense>{move || crumbs.get().unwrap_or_default().into_view()}</Suspense>

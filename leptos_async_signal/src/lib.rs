@@ -37,15 +37,15 @@ mod async_state;
 #[cfg(feature = "ssr")]
 use async_state::AsyncState;
 
-/// An async write signal. This is almost the same as the regular Leptos write
-/// signal, but under  the hood also takes care of notifying the resource about
-/// the new value (in SSR mode).
+/// An async write signal. This is almost the same as the regular Leptos (Arc)
+/// write signal, but under the hood also takes care of notifying the resource
+/// about the new value (in SSR mode).
 #[derive(Clone)]
 pub struct AsyncWriteSignal<T>
 where
     T: 'static,
 {
-    inner: WriteSignal<T>,
+    inner: ArcWriteSignal<T>,
     #[cfg(feature = "ssr")]
     state: AsyncState,
 }
@@ -54,11 +54,11 @@ where
 /// signal. The default provided value is used only as a placeholder value in
 /// the case that write signal is never written to (detected by the dropped
 /// value before write/set).
-pub fn async_signal<T>(default: T) -> (Resource<T>, AsyncWriteSignal<T>)
+pub fn async_signal<T>(default: T) -> (ArcResource<T>, AsyncWriteSignal<T>)
 where
     T: Clone + Send + Sync + PartialEq + Serialize + DeserializeOwned,
 {
-    let (signal_read, signal_write) = signal(default);
+    let (signal_read, signal_write) = arc_signal(default);
     #[cfg(feature = "ssr")]
     let state = AsyncState::default();
     let signal_write = AsyncWriteSignal {
@@ -66,11 +66,15 @@ where
         #[cfg(feature = "ssr")]
         state: state.clone(),
     };
-    let resource = Resource::new(
-        move || signal_read.get(),
+    let resource = ArcResource::new(
+        {
+            let signal_read = signal_read.clone();
+            move || signal_read.get()
+        },
         move |_| {
             #[cfg(feature = "ssr")]
             let state = state.clone();
+            let signal_read = signal_read.clone();
             async move {
                 #[cfg(feature = "ssr")]
                 state.wait().await;
@@ -98,12 +102,5 @@ where
         #[cfg(feature = "ssr")]
         self.state.mark_ready();
         res
-    }
-}
-
-#[cfg(feature = "ssr")]
-impl<T> Drop for AsyncWriteSignal<T> {
-    fn drop(&mut self) {
-        self.state.mark_ready();
     }
 }
