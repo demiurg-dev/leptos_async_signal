@@ -54,7 +54,7 @@ where
 /// signal. The default provided value is used only as a placeholder value in
 /// the case that write signal is never written to (detected by the dropped
 /// value before write/set).
-pub fn async_signal<T>(default: T) -> (Resource<T>, AsyncWriteSignal<T>)
+pub fn async_signal<T>(default: T) -> (ArcResource<T>, AsyncWriteSignal<T>)
 where
     T: Clone + Send + Sync + PartialEq + Serialize + DeserializeOwned,
 {
@@ -66,7 +66,7 @@ where
         #[cfg(feature = "ssr")]
         state: state.clone(),
     };
-    let resource = Resource::new(
+    let resource = ArcResource::new(
         {
             let signal_read = signal_read.clone();
             move || signal_read.get()
