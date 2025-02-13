@@ -187,19 +187,19 @@ fn PostPage() -> impl IntoView {
 
     view! {
         <Suspense>
-            {move || Suspend::new({
+            { move || Suspend::new({
+                // let crumbs = crumbs.clone();
                 async move {
                     match post.await {
                         Ok(post) => {
+                            // Note: Should not set crumbs here as this will cause a deadlock
+                            // between current Suspense and the once waiting on the crumbs to be
+                            // set.
+                            // crumbs.set(Crumbs::Post { title: post.title.clone() });
                             let body = post
                                 .body
                                 .lines()
                                 .map(|line| {
-                                    // let crumbs = crumbs.clone();
-                                    // Note: Should not set crumbs here as this will cause a deadlock
-                                    // between current Suspense and the once waiting on the crumbs to be
-                                    // set.
-                                    // crumbs.set(Crumbs::Post { title: post.title.clone() });
                                     view! { <p>{line.to_string()}</p> }
                                 })
                                 .collect_view();
