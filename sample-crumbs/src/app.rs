@@ -159,7 +159,7 @@ fn PostPage() -> impl IntoView {
     let post = Resource::new(
         move || params.read().as_ref().ok().and_then(|pid| pid.id),
         move |post_id| {
-            let crumbs = crumbs.clone();
+            // let crumbs = crumbs.clone();
             async move {
                 match post_id {
                     Some(id) => {
@@ -168,14 +168,14 @@ fn PostPage() -> impl IntoView {
                         // Set crumbs to the post, once fetched.
                         // Note: crumbs need to be set here, and not in the Suspend, as otherwise
                         // there is a deadlock between two Suspends.
-                        match &post_res {
+                        /* match &post_res {
                             Ok(post) => {
                                 crumbs.set(Crumbs::Post { title: post.title.clone() });
                             }
                             Err(_) => {
                                 crumbs.set(Crumbs::Home);
                             }
-                        }
+                        }*/
 
                         post_res.map_err(|err| err.to_string())
                     }
@@ -188,14 +188,14 @@ fn PostPage() -> impl IntoView {
     view! {
         <Suspense>
             { move || Suspend::new({
-                // let crumbs = crumbs.clone();
+                let crumbs = crumbs.clone();
                 async move {
                     match post.await {
                         Ok(post) => {
                             // Note: Should not set crumbs here as this will cause a deadlock
                             // between current Suspense and the once waiting on the crumbs to be
                             // set.
-                            // crumbs.set(Crumbs::Post { title: post.title.clone() });
+                            crumbs.set(Crumbs::Post { title: post.title.clone() });
                             let body = post
                                 .body
                                 .lines()
@@ -214,7 +214,7 @@ fn PostPage() -> impl IntoView {
                             // Note: Should not set crumbs here as this will cause a deadlock
                             // between current Suspense and the once waiting on the crumbs to be
                             // set.
-                            // crumbs.set(Crumbs::Home);
+                            crumbs.set(Crumbs::Home);
                             view! { <h1>Error: {err}</h1> }
                                 .into_any()
                         }
