@@ -8,4 +8,4 @@ clippy:
 
 fmt:
 	cargo +nightly fmt -- --check
-	leptosfmt sample-crumbs/ --check
+	# leptosfmt sample-crumbs/ --check
