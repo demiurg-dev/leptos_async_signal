@@ -154,46 +154,71 @@ struct PostRequest {
 /// Renders the page to show a single post.
 #[component]
 fn PostPage() -> impl IntoView {
+    let crumbs = use_context::<AsyncWriteSignal<Crumbs>>().unwrap();
     let params = use_params::<PostRequest>();
     let post = Resource::new(
         move || params.read().as_ref().ok().and_then(|pid| pid.id),
-        |post_id| async move {
-            match post_id {
-                Some(id) => {
-                    let post_res = post_by_id(id).await;
+        move |post_id| {
+            let crumbs = crumbs.clone();
+            async move {
+                match post_id {
+                    Some(id) => {
+                        let post_res = post_by_id(id).await;
 
-                    // Set crumbs to the post, once fetched.
-                    let crumbs = use_context::<AsyncWriteSignal<Crumbs>>().unwrap();
-                    match &post_res {
-                        Ok(post) => crumbs.set(Crumbs::Post { title: post.title.clone() }),
-                        Err(_) => crumbs.set(Crumbs::Home),
+                        // Set crumbs to the post, once fetched.
+                        // Note: crumbs need to be set here, and not in the Suspend, as otherwise
+                        // there is a deadlock between two Suspends.
+                        match &post_res {
+                            Ok(post) => {
+                                crumbs.set(Crumbs::Post { title: post.title.clone() });
+                            }
+                            Err(_) => {
+                                crumbs.set(Crumbs::Home);
+                            }
+                        }
+
+                        post_res.map_err(|err| err.to_string())
                     }
-
-                    post_res.map_err(|err| err.to_string())
+                    None => Err("Invalid URL".to_string()),
                 }
-                None => Err("Invalid URL".to_string()),
             }
         },
     );
 
     view! {
         <Suspense>
-            {move || Suspend::new(async move {
-                match post.await {
-                    Ok(post) => {
-                        let body = post
-                            .body
-                            .lines()
-                            .map(|line| view! { <p>{line.to_string()}</p> })
-                            .collect_view();
-                        view! {
-                            <Title text=post.title.clone() />
-                            <h1>{post.title}</h1>
-                            {body}
+            {move || Suspend::new({
+                async move {
+                    match post.await {
+                        Ok(post) => {
+                            let body = post
+                                .body
+                                .lines()
+                                .map(|line| {
+                                    // let crumbs = crumbs.clone();
+                                    // Note: Should not set crumbs here as this will cause a
+                                    // deadlock between current Suspense and the once waiting on
+                                    // the crumbs to be set.
+                                    // crumbs.set(Crumbs::Post { title: post.title.clone() });
+                                    view! { <p>{line.to_string()}</p> }
+                                })
+                                .collect_view();
+                            view! {
+                                <Title text=post.title.clone() />
+                                <h1>{post.title}</h1>
+                                {body}
+                            }
+                                .into_any()
                         }
-                            .into_any()
+                        Err(err) => {
+                            // Note: Should not set crumbs here as this will cause a deadlock
+                            // between current Suspense and the once waiting on the crumbs to be
+                            // set.
+                            // crumbs.set(Crumbs::Home);
+                            view! { <h1>Error: {err}</h1> }
+                                .into_any()
+                        }
                     }
-                    Err(err) => view! { <h1>Error: {err}</h1> }.into_any(),
                 }
             })}
         </Suspense>
