@@ -196,9 +196,9 @@ fn PostPage() -> impl IntoView {
                                 .lines()
                                 .map(|line| {
                                     // let crumbs = crumbs.clone();
-                                    // Note: Should not set crumbs here as this will cause a
-                                    // deadlock between current Suspense and the once waiting on
-                                    // the crumbs to be set.
+                                    // Note: Should not set crumbs here as this will cause a deadlock
+                                    // between current Suspense and the once waiting on the crumbs to be
+                                    // set.
                                     // crumbs.set(Crumbs::Post { title: post.title.clone() });
                                     view! { <p>{line.to_string()}</p> }
                                 })
