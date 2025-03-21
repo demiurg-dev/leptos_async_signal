@@ -104,3 +104,10 @@ where
         res
     }
 }
+
+impl<T> Drop for AsyncWriteSignal<T> {
+    fn drop(&mut self) {
+        #[cfg(feature = "ssr")]
+        self.state.mark_ready()
+    }
+}
