@@ -9,11 +9,11 @@ crate-type = ["cdylib", "rlib"]
 [dependencies]
 leptos.workspace = true
 leptos_async_signal = { path = "../leptos_async_signal" }
-leptos_router = { version = "0.7.5" }
-axum = { version = "0.7", optional = true }
+leptos_router = { version = "0.8.0-beta" }
+axum = { version = "0.8", optional = true }
 console_error_panic_hook = "0.1"
-leptos_axum = { version = "0.7.5", optional = true }
-leptos_meta = { version = "0.7.5" }
+leptos_axum = { version = "0.8.0-beta", optional = true }
+leptos_meta = { version = "0.8.0-beta" }
 tokio = { workspace = true, optional = true }
 tower = { version = "0.5.2", optional = true }
 tower-http = { version = "0.6.2", features = ["fs"], optional = true }

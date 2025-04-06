@@ -103,7 +103,7 @@ async fn list_posts() -> Result<Vec<(u64, Post)>, ServerFnError> {
 async fn post_by_id(id: u64) -> Result<Post, ServerFnError<String>> {
     crate::db::post_by_id(id)
         .await
-        .ok_or(ServerFnError::WrappedServerError(format!("Post not found: {id}")))
+        .ok_or(ServerFnError::ServerError(format!("Post not found: {id}")))
 }
 
 /// Renders the home page with list of posts.
