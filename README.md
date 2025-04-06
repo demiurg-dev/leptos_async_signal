@@ -75,5 +75,5 @@ The currently supported Leptos version is `0.7.x`.
 ## Contributions
 
 Contributions to `leptos_async_signal` are welcome! If you encounter bugs, have feature requests, or 
-want to contribute improvements, please open an issue or a pull request on the [GitHub repository]
-(https://github.com/demiurg-dev/leptos_async_signal).
+want to contribute improvements, please open an issue or a pull request on the
+[GitHub repository](https://github.com/demiurg-dev/leptos_async_signal).
