@@ -28,6 +28,8 @@
 //!
 //! The currently supported Leptos version is `0.7.x`.
 
+use std::sync::Arc;
+
 use leptos::prelude::*;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
@@ -39,21 +41,35 @@ use async_state::AsyncState;
 
 /// An async write signal. This is almost the same as the regular Leptos (Arc)
 /// write signal, but under the hood also takes care of notifying the resource
-/// about the new value (in SSR mode).
+/// paired with this signal about the new value (in SSR mode).
+///
+/// If this signal is never used (i.e. no write/set of a value), upon dropping
+/// of the final clone of this signal, the paired resource will be notified to
+/// allow it to return the default value it holds.  Conversely, keeping clones
+/// of this signal around and never calling write/set will ensure the resource
+/// will never return, which typically manifest in the SSR hanging forever.
 #[derive(Clone)]
 pub struct AsyncWriteSignal<T>
 where
     T: 'static,
 {
-    inner: ArcWriteSignal<T>,
+    inner: Arc<AsyncWriteSignalInner<T>>,
+}
+
+#[derive(Clone)]
+struct AsyncWriteSignalInner<T>
+where
+    T: 'static,
+{
+    signal_write: ArcWriteSignal<T>,
     #[cfg(feature = "ssr")]
     state: AsyncState,
 }
 
-/// Creates a new async signal, that is, a pair of a resource and an async write
-/// signal. The default provided value is used only as a placeholder value in
-/// the case that write signal is never written to (detected by the dropped
-/// value before write/set).
+/// Creates a new async signal, that is, the pairing of a resource with an
+/// async write signal. The default provided value is used as a placeholder
+/// value in the case that the async write signal is never written to.  How
+/// this works is documented by [`AsyncWriteSignal`].
 pub fn async_signal<T>(default: T) -> (ArcResource<T>, AsyncWriteSignal<T>)
 where
     T: Clone + Send + Sync + PartialEq + Serialize + DeserializeOwned,
@@ -61,8 +77,8 @@ where
     let (signal_read, signal_write) = arc_signal(default);
     #[cfg(feature = "ssr")]
     let state = AsyncState::default();
-    let signal_write = AsyncWriteSignal {
-        inner: signal_write,
+    let inner = AsyncWriteSignalInner {
+        signal_write,
         #[cfg(feature = "ssr")]
         state: state.clone(),
     };
@@ -82,7 +98,8 @@ where
             }
         },
     );
-    (resource, signal_write)
+    let async_write_signal = AsyncWriteSignal { inner: Arc::new(inner) };
+    (resource, async_write_signal)
 }
 
 impl<T> Set for AsyncWriteSignal<T>
@@ -92,15 +109,24 @@ where
     type Value = T;
 
     fn set(&self, value: Self::Value) {
-        self.inner.set(value);
+        self.inner.signal_write.set(value);
         #[cfg(feature = "ssr")]
-        self.state.mark_ready();
+        self.inner.state.mark_ready();
     }
 
     fn try_set(&self, value: Self::Value) -> Option<Self::Value> {
-        let res = self.inner.try_set(value);
+        let res = self.inner.signal_write.try_set(value);
         #[cfg(feature = "ssr")]
-        self.state.mark_ready();
+        self.inner.state.mark_ready();
         res
+    }
+}
+
+#[cfg(feature = "ssr")]
+impl<T> Drop for AsyncWriteSignal<T> {
+    fn drop(&mut self) {
+        if let Some(inner) = Arc::get_mut(&mut self.inner) {
+            inner.state.mark_ready()
+        }
     }
 }
