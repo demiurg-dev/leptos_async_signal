@@ -1,4 +1,4 @@
-check-all: check clippy fmt
+check-all: check clippy check_fmt
 
 check:
 	cargo check
@@ -6,6 +6,9 @@ check:
 clippy:
 	cargo clippy -- -D warnings
 
-fmt:
+check_fmt:
 	cargo +nightly fmt -- --check
 	# leptosfmt sample-crumbs/ --check
+
+fmt:
+	cargo +nightly fmt
