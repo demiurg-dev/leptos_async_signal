@@ -990,7 +990,7 @@ dependencies = [
 
 [[package]]
 name = "leptos_async_signal"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "leptos",
  "serde",
