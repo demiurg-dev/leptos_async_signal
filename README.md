@@ -49,8 +49,8 @@ To use `leptos_async_signal`, add it to your `Cargo.toml`, and use `ssr` feature
 
 ```toml
 [dependencies]
-leptos_async_signal = "0.1.0"
-leptos = "0.7"
+leptos_async_signal = "0.6.0"
+leptos = "0.8"
 
 [features]
 default = []
@@ -63,7 +63,13 @@ See an example in `sample-crumbs` [Cargo.toml](sample-crumbs/Cargo.toml)
 
 ## Leptos versions
 
-The currently supported Leptos version is `0.7.x`.
+The latest supported Leptos version is `0.8.x`. See the table below for version compatibility:
+
+| leptos | leptos_async_signal |
+|:-------|:--------------------|
+| 0.8.x    | 0.6.0             |
+| 0.7.x    | 0.5.0             |
+
 
 ## Notes
 

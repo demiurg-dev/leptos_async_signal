@@ -1,4 +1,4 @@
-//! # About async signal
+//! # About the async signal
 //!
 //! `leptos_async_signal` is a library built on top of
 //! [Leptos](https://github.com/leptos-rs/leptos) that extends the functionality of Leptos signals
@@ -26,7 +26,13 @@
 //!
 //! # Leptos versions
 //!
-//! The currently supported Leptos version is `0.7.x`.
+//! The latest supported Leptos version is `0.8.x`. See the table below for
+//! version compatibility:
+//!
+//! | leptos | leptos_async_signal |
+//! |:-------|:--------------------|
+//! | 0.8.x    | 0.6.0             |
+//! | 0.7.x    | 0.5.0             |
 
 use std::sync::Arc;
 
