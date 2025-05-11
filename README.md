@@ -49,7 +49,7 @@ To use `leptos_async_signal`, add it to your `Cargo.toml`, and use `ssr` feature
 
 ```toml
 [dependencies]
-leptos_async_signal = "0.5.0"
+leptos_async_signal = "0.6.0"
 leptos = "0.8"
 
 [features]
