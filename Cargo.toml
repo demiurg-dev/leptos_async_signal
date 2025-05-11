@@ -3,7 +3,7 @@ resolver = "2"
 members = ["leptos_async_signal", "sample-crumbs", "tests_ssr"]
 
 [workspace.dependencies]
-leptos = "0.7.5"
+leptos = "0.8.0-beta"
 tokio = { version = "1", features = ["full"] }
 serde = { version = "1", features = ["derive"] } 
 
